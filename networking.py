@@ -1,8 +1,6 @@
 import os
-from time import sleep
 
 import requests
-from constants.api_endpoint import API_LOGIN
 from dotenv import load_dotenv
 
 
@@ -32,7 +30,7 @@ class DatabaseConnection:
                 "description": build_json["description"],
                 "race": "TERRAN",
                 "v_race": "TERRAN",
-                "user_id": "2",
+                "user_id": "1",
             },
             headers={
                 "Authorization": f"Bearer {self.acces_token}",
