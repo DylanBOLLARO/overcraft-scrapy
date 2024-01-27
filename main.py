@@ -1,29 +1,41 @@
-__version__ = "0.0.1"
-
+__version__ = "0.0.2"
 import argparse
+import json
 import logging
 from enum import Enum
+
 from scrapy.crawler import CrawlerProcess
 
+from networking import DatabaseConnection
 from overcraft.spiders.builds import BuildsSpider
+
 
 class Actions(Enum):
     SCRAPE = "scrape"
+    UPDATE = "update"
 
 
 def main(args):
     if args.action == Actions.SCRAPE.value:
         logging.info("Creation of the requested file from the original Excel file")
-        process = CrawlerProcess(settings={
-            "FEEDS": {
-                "data.json": {"format": "json"},
-            },
-            'FEED_EXPORT_ENCODING': 'utf-8',
-            'LOG_LEVEL' : 'WARNING'
-        })
+        process = CrawlerProcess(
+            settings={
+                "FEEDS": {
+                    "data.json": {"format": "json"},
+                },
+                "FEED_EXPORT_ENCODING": "utf-8",
+            }
+        )
         process.crawl(BuildsSpider)
         process.start()
 
+    if args.action == Actions.UPDATE.value:
+        with open("data.json", "r", encoding="utf8") as json_file:
+            data = json.load(json_file)
+        database_connection = DatabaseConnection()
+
+        for build in data[:50]:
+            database_connection.create_build(build)
 
 
 if __name__ == "__main__":
